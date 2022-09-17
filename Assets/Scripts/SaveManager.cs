@@ -4,6 +4,7 @@ using System.IO;
 using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 public class SaveManager : MonoBehaviour
 {
@@ -13,6 +14,7 @@ public class SaveManager : MonoBehaviour
     public string currentName = "";
     public string savedName = "";
     public TMP_InputField nameField;
+    public Button deleteButton;
 
     private void Awake()
     {
@@ -37,6 +39,10 @@ public class SaveManager : MonoBehaviour
         {
             nameField = GameObject.Find("InputField (TMP)").GetComponent<TMP_InputField>();
             nameField.text = currentName;
+            nameField.onEndEdit.AddListener(SetNameFromField);
+
+            deleteButton = GameObject.Find("Delete Data Button").GetComponent<Button>();
+            deleteButton.onClick.AddListener(DeleteSaveData);
         }
     }
 
@@ -54,9 +60,9 @@ public class SaveManager : MonoBehaviour
         public int score;
     }
 
-    public void SetNameFromField()
+    public void SetNameFromField(string name)
     {
-        currentName = nameField.text;
+        currentName = name;
     }
 
     public void SaveHighScore()
@@ -84,6 +90,22 @@ public class SaveManager : MonoBehaviour
             savedName = data.highScoreName;
             currentName = data.currentName;
             currentScore = data.score;
+        }
+    }
+
+    public void DeleteSaveData()
+    {
+        string path = Application.persistentDataPath + "/savefile.json";
+
+        if (File.Exists(path))
+        {
+            File.Delete(path);
+
+            savedName = "";
+            currentName = "";
+            currentScore = 0;
+
+            nameField.text = "";
         }
     }
 }
